@@ -8,6 +8,7 @@ from collections import deque, defaultdict
 
 
 # 1. Clone Graph
+# PATTERN: DFS with Hash Map
 class Node:
     def __init__(self, val=0, neighbors=None):
         self.val = val
@@ -18,6 +19,7 @@ def clone_graph(node):
     """
     Deep copy of undirected graph.
     
+    Pattern: DFS/BFS with hash map to track clones
     Approach: DFS/BFS with hash map old_node -> new_node
     Steps:
     1. Use hash map to track cloned nodes
@@ -47,10 +49,12 @@ def clone_graph(node):
 
 
 # 2. Course Schedule
+# PATTERN: Cycle Detection / Topological Sort (DFS)
 def can_finish(num_courses, prerequisites):
     """
     Check if can finish all courses given prerequisites (detect cycle in DAG).
     
+    Pattern: 3-state DFS for cycle detection in directed graph
     Problem: Check if it's possible to finish all courses given prerequisite pairs.
     Input: numCourses = 2, prerequisites = [[1,0]]
     Output: True
@@ -132,10 +136,12 @@ def can_finish(num_courses, prerequisites):
 
 
 # 3. Pacific Atlantic Water Flow
+# PATTERN: Multi-source DFS/BFS
 def pacific_atlantic(heights):
     """
     Find cells where water can flow to both Pacific and Atlantic oceans.
     
+    Pattern: Multi-source DFS from borders
     Approach: Multi-source DFS/BFS from ocean borders
     Steps:
     1. DFS from Pacific borders (top, left)
@@ -176,10 +182,12 @@ def pacific_atlantic(heights):
 
 
 # 4. Number of Islands
+# PATTERN: DFS/BFS (Connected Components)
 def num_islands(grid):
     """
     Count connected components of '1's in grid.
     
+    Pattern: DFS/BFS to find connected components
     Approach: DFS/BFS to mark connected regions
     Steps:
     1. For each unvisited '1', start DFS/BFS
@@ -289,10 +297,12 @@ def longest_consecutive(nums):
 
 
 # 6. Graph Valid Tree
+# PATTERN: Union Find / DFS Cycle Detection
 def valid_tree(n, edges):
     """
     Check if undirected graph forms valid tree.
     
+    Pattern: Union Find or DFS with cycle detection
     Tree conditions:
     1. n nodes and n-1 edges
     2. All nodes connected (no separate components)

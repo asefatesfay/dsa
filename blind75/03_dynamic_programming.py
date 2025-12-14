@@ -6,10 +6,12 @@ Core DP patterns for technical interviews.
 
 
 # 1. Climbing Stairs
+# PATTERN: Dynamic Programming (Fibonacci)
 def climb_stairs(n):
     """
     Number of ways to climb n stairs (1 or 2 steps at a time).
     
+    Pattern: DP - Fibonacci sequence
     Approach: DP - Fibonacci pattern
     Steps:
     1. Base: ways[1]=1, ways[2]=2
@@ -82,10 +84,12 @@ def coin_change(coins, amount):
 
 
 # 3. Longest Increasing Subsequence
+# PATTERN: Dynamic Programming (Subsequence)
 def length_of_lis(nums):
     """
     Length of longest strictly increasing subsequence.
     
+    Pattern: DP for subsequence problems
     Approach 1: DP O(n²)
     - dp[i] = length of LIS ending at i
     - dp[i] = max(dp[j] + 1) for all j < i where nums[j] < nums[i]
@@ -108,10 +112,12 @@ def length_of_lis(nums):
 
 
 # 4. Longest Common Subsequence
+# PATTERN: Dynamic Programming (2D DP)
 def longest_common_subsequence(text1, text2):
     """
     Length of LCS between two strings.
     
+    Pattern: 2D DP for string matching
     Approach: 2D DP
     Steps:
     1. dp[i][j] = LCS length of text1[0:i] and text2[0:j]
@@ -134,10 +140,12 @@ def longest_common_subsequence(text1, text2):
 
 
 # 5. Word Break
+# PATTERN: Dynamic Programming (String Segmentation)
 def word_break(s, word_dict):
     """
     Check if string can be segmented into words from dictionary.
     
+    Pattern: DP for string segmentation
     Approach: DP
     Steps:
     1. dp[i] = True if s[0:i] can be segmented
@@ -161,10 +169,12 @@ def word_break(s, word_dict):
 
 
 # 6. Combination Sum IV
+# PATTERN: Dynamic Programming (Unbounded Knapsack)
 def combination_sum4(nums, target):
     """
     Number of combinations that sum to target (order matters).
     
+    Pattern: Unbounded Knapsack with permutations
     Approach: DP - unbounded knapsack with permutations
     Steps:
     1. dp[i] = number of ways to make sum i
@@ -242,10 +252,12 @@ def rob(nums):
 
 
 # 8. House Robber II
+# PATTERN: Dynamic Programming (Circular Array)
 def rob2(nums):
     """
     Houses arranged in circle (first and last are adjacent).
     
+    Pattern: DP with circular constraint
     Approach: Run rob() twice
     Steps:
     1. Case 1: Rob houses 0 to n-2 (exclude last)
@@ -260,10 +272,12 @@ def rob2(nums):
 
 
 # 9. Decode Ways
+# PATTERN: Dynamic Programming (Fibonacci-like)
 def num_decodings(s):
     """
     Number of ways to decode string where 'A'=1, 'B'=2, ..., 'Z'=26.
     
+    Pattern: DP with multiple transition choices
     Approach: DP
     Steps:
     1. dp[i] = ways to decode s[0:i]
@@ -294,10 +308,12 @@ def num_decodings(s):
 
 
 # 10. Unique Paths
+# PATTERN: Dynamic Programming (Grid DP)
 def unique_paths(m, n):
     """
     Number of paths from top-left to bottom-right in m×n grid (only right/down).
     
+    Pattern: Grid DP / Combinatorics
     Approach: DP or combinatorics
     DP Steps:
     1. dp[i][j] = paths to cell (i,j)
@@ -314,10 +330,12 @@ def unique_paths(m, n):
 
 
 # 11. Jump Game
+# PATTERN: Greedy
 def can_jump(nums):
     """
     Check if can reach last index from first (each element is max jump length).
     
+    Pattern: Greedy - track maximum reachable position
     Approach: Greedy - track farthest reachable
     Steps:
     1. Track max_reach = 0

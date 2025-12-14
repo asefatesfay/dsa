@@ -12,10 +12,12 @@ import heapq
 # STRING PROBLEMS
 # ============================================
 
+# PATTERN: Sliding Window
 def length_of_longest_substring(s):
     """
     Longest substring without repeating characters.
     
+    Pattern: Sliding window with hash map
     Approach: Sliding window with hash map
     Time: O(n), Space: O(min(n, alphabet_size))
     """
@@ -31,13 +33,21 @@ def length_of_longest_substring(s):
     return max_len
 
 
+# PATTERN: Hash Map
 def is_anagram(s, t):
-    """Check if two strings are anagrams."""
+    """Check if two strings are anagrams.
+    
+    Pattern: Hash Map / Frequency Counter
+    """
     return Counter(s) == Counter(t)
 
 
+# PATTERN: Hash Map (Sorted Key)
 def group_anagrams(strs):
-    """Group anagrams together."""
+    """Group anagrams together.
+    
+    Pattern: Hash map with sorted string as key
+    """
     anagram_map = defaultdict(list)
     for s in strs:
         key = ''.join(sorted(s))
@@ -45,8 +55,12 @@ def group_anagrams(strs):
     return list(anagram_map.values())
 
 
+# PATTERN: Stack
 def is_valid_parentheses(s):
-    """Check if parentheses are valid."""
+    """Check if parentheses are valid.
+    
+    Pattern: Stack for matching pairs
+    """
     stack = []
     pairs = {'(': ')', '[': ']', '{': '}'}
     for char in s:
@@ -57,6 +71,7 @@ def is_valid_parentheses(s):
     return not stack
 
 
+# PATTERN: Two Pointers
 def is_palindrome(s):
     """Check if string is valid palindrome (alphanumeric only)."""
     left, right = 0, len(s) - 1
@@ -76,10 +91,12 @@ def is_palindrome(s):
 # INTERVAL PROBLEMS
 # ============================================
 
+# PATTERN: Sort + Merge
 def merge_intervals(intervals):
     """
     Merge overlapping intervals.
     
+    Pattern: Sort by start, then merge overlapping
     Approach: Sort by start, then merge
     Time: O(n log n), Space: O(n)
     """
@@ -98,10 +115,12 @@ def merge_intervals(intervals):
     return merged
 
 
+# PATTERN: Interval Merging
 def insert_interval(intervals, new_interval):
     """
     Insert new interval and merge if needed.
     
+    Pattern: Three-phase insertion (before, merge, after)
     Time: O(n), Space: O(n)
     """
     result = []
@@ -138,8 +157,12 @@ class ListNode:
         self.next = next
 
 
+# PATTERN: In-place Reversal
 def reverse_list(head):
-    """Reverse linked list iteratively."""
+    """Reverse linked list iteratively.
+    
+    Pattern: Three-pointer in-place reversal
+    """
     prev = None
     curr = head
     while curr:
@@ -150,8 +173,12 @@ def reverse_list(head):
     return prev
 
 
+# PATTERN: Fast and Slow Pointers (Floyd's Cycle Detection)
 def has_cycle(head):
-    """Detect cycle using fast/slow pointers."""
+    """Detect cycle using fast/slow pointers.
+    
+    Pattern: Floyd's cycle detection (tortoise and hare)
+    """
     slow = fast = head
     while fast and fast.next:
         slow = slow.next
@@ -161,8 +188,12 @@ def has_cycle(head):
     return False
 
 
+# PATTERN: Two Pointers (Merge)
 def merge_two_lists(l1, l2):
-    """Merge two sorted lists."""
+    """Merge two sorted lists.
+    
+    Pattern: Two-pointer merge with dummy node
+    """
     dummy = ListNode()
     curr = dummy
     
@@ -183,10 +214,12 @@ def merge_two_lists(l1, l2):
 # MATRIX PROBLEMS
 # ============================================
 
+# PATTERN: In-place Modification
 def set_zeroes(matrix):
     """
     Set entire row and column to 0 if element is 0.
     
+    Pattern: Use first row/col as markers for O(1) space
     Approach: Use first row/col as markers
     Time: O(m*n), Space: O(1)
     """
@@ -216,8 +249,12 @@ def set_zeroes(matrix):
             matrix[i][0] = 0
 
 
+# PATTERN: Layer-by-Layer Traversal
 def spiral_order(matrix):
-    """Return matrix elements in spiral order."""
+    """Return matrix elements in spiral order.
+    
+    Pattern: Process outer layer, shrink boundaries
+    """
     if not matrix:
         return []
     
@@ -252,7 +289,7 @@ def spiral_order(matrix):
 
 
 # ============================================
-# TREE PROBLEMS (Basics)
+# TREE PROBLEMS
 # ============================================
 
 class TreeNode:
@@ -262,15 +299,23 @@ class TreeNode:
         self.right = right
 
 
+# PATTERN: DFS (Recursion)
 def max_depth(root):
-    """Maximum depth of binary tree."""
+    """Maximum depth of binary tree.
+    
+    Pattern: Recursive DFS
+    """
     if not root:
         return 0
     return 1 + max(max_depth(root.left), max_depth(root.right))
 
 
+# PATTERN: DFS (Recursion)
 def is_same_tree(p, q):
-    """Check if two trees are identical."""
+    """Check if two trees are identical.
+    
+    Pattern: Recursive pre-order traversal
+    """
     if not p and not q:
         return True
     if not p or not q or p.val != q.val:
@@ -278,8 +323,12 @@ def is_same_tree(p, q):
     return is_same_tree(p.left, q.left) and is_same_tree(p.right, q.right)
 
 
+# PATTERN: DFS (Recursion)
 def invert_tree(root):
-    """Invert binary tree."""
+    """Invert binary tree.
+    
+    Pattern: Recursive DFS with swap
+    """
     if not root:
         return None
     root.left, root.right = invert_tree(root.right), invert_tree(root.left)
@@ -290,10 +339,12 @@ def invert_tree(root):
 # HEAP PROBLEMS
 # ============================================
 
+# PATTERN: Heap (Min Heap)
 def top_k_frequent(nums, k):
     """
     Find k most frequent elements.
     
+    Pattern: Min heap of size k or bucket sort
     Approach: Counter + heap or bucket sort
     Time: O(n log k), Space: O(n)
     """
@@ -301,8 +352,12 @@ def top_k_frequent(nums, k):
     return [item for item, freq in count.most_common(k)]
 
 
+# PATTERN: Two Heaps (Max Heap + Min Heap)
 class MedianFinder:
-    """Find median from data stream using two heaps."""
+    """Find median from data stream using two heaps.
+    
+    Pattern: Two heaps (max heap for small half, min heap for large half)
+    """
     
     def __init__(self):
         self.small = []  # Max heap (negated)

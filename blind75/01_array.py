@@ -6,6 +6,7 @@ Essential array manipulation and algorithm problems for technical interviews.
 
 
 # 1. Two Sum
+# PATTERN: Hash Map
 def two_sum(nums, target):
     """
     Find indices of two numbers that add up to target.
@@ -14,6 +15,7 @@ def two_sum(nums, target):
     Input: nums = [2,7,11,15], target = 9
     Output: [0,1] (because nums[0] + nums[1] = 2 + 7 = 9)
     
+    Pattern: Hash Map for O(1) complement lookup
     Approach: Hash map to store value -> index
     
     Algorithm Steps:
@@ -47,6 +49,7 @@ def two_sum(nums, target):
 
 
 # 2. Best Time to Buy and Sell Stock
+# PATTERN: Greedy / Single Pass
 def max_profit(prices):
     """
     Maximum profit from one buy and one sell transaction.
@@ -55,6 +58,7 @@ def max_profit(prices):
     Input: prices = [7,1,5,3,6,4]
     Output: 5 (buy at 1, sell at 6, profit = 6-1 = 5)
     
+    Pattern: Greedy - track running min and max profit
     Approach: Track minimum price seen so far and max profit
     
     Algorithm Steps:
@@ -97,10 +101,12 @@ def max_profit(prices):
 
 
 # 3. Contains Duplicate
+# PATTERN: Hash Set
 def contains_duplicate(nums):
     """
     Check if array contains any duplicates.
     
+    Pattern: Hash Set for O(1) lookup
     Approach: Use set to track seen elements
     Time: O(n), Space: O(n)
     """
@@ -108,6 +114,7 @@ def contains_duplicate(nums):
 
 
 # 4. Product of Array Except Self
+# PATTERN: Prefix/Suffix Products
 def product_except_self(nums):
     """
     Return array where output[i] = product of all elements except nums[i].
@@ -116,6 +123,8 @@ def product_except_self(nums):
     Problem: For each position, calculate product of all other elements.
     Input: nums = [1,2,3,4]
     Output: [24,12,8,6]
+    
+    Pattern: Prefix/Suffix products in two passes
     Explanation: 
     - output[0] = 2*3*4 = 24
     - output[1] = 1*3*4 = 12
@@ -167,6 +176,7 @@ def product_except_self(nums):
 
 
 # 5. Maximum Subarray (Kadane's Algorithm)
+# PATTERN: Dynamic Programming / Kadane's Algorithm
 def max_subarray(nums):
     """
     Find contiguous subarray with largest sum.
@@ -175,6 +185,7 @@ def max_subarray(nums):
     Input: nums = [-2,1,-3,4,-1,2,1,-5,4]
     Output: 6 (subarray [4,-1,2,1] has the largest sum)
     
+    Pattern: Dynamic Programming (Kadane's Algorithm)
     Approach: Kadane's Algorithm - Dynamic Programming
     
     Algorithm Steps:
@@ -221,10 +232,12 @@ def max_subarray(nums):
 
 
 # 6. Maximum Product Subarray
+# PATTERN: Dynamic Programming (Track Max/Min)
 def max_product(nums):
     """
     Find contiguous subarray with largest product.
     
+    Pattern: Dynamic Programming with state tracking (max and min)
     Approach: Track both max and min products (negatives can flip)
     Steps:
     1. Maintain max_prod and min_prod ending at current position
@@ -246,10 +259,12 @@ def max_product(nums):
 
 
 # 7. Find Minimum in Rotated Sorted Array
+# PATTERN: Binary Search (Modified)
 def find_min(nums):
     """
     Find minimum in rotated sorted array (no duplicates).
     
+    Pattern: Modified Binary Search on rotated array
     Approach: Binary search
     Steps:
     1. If nums[left] < nums[right], array not rotated, return nums[left]
@@ -272,10 +287,12 @@ def find_min(nums):
 
 
 # 8. Search in Rotated Sorted Array
+# PATTERN: Binary Search (Modified)
 def search(nums, target):
     """
     Search target in rotated sorted array, return index or -1.
     
+    Pattern: Modified Binary Search with pivot detection
     Approach: Modified binary search
     Steps:
     1. Find which half is properly sorted
@@ -306,6 +323,7 @@ def search(nums, target):
 
 
 # 9. 3Sum
+# PATTERN: Two Pointers
 def three_sum(nums):
     """
     Find all unique triplets that sum to zero.
@@ -314,6 +332,7 @@ def three_sum(nums):
     Input: nums = [-1,0,1,2,-1,-4]
     Output: [[-1,-1,2], [-1,0,1]]
     
+    Pattern: Two Pointers (after sorting)
     Approach: Sort + Two Pointers
     
     Algorithm Steps:
@@ -390,10 +409,12 @@ def three_sum(nums):
 
 
 # 10. Container With Most Water
+# PATTERN: Two Pointers
 def max_area(height):
     """
     Find two lines that form container with most water.
     
+    Pattern: Two Pointers (converging from ends)
     Approach: Two pointers from both ends
     Steps:
     1. Start with widest container (left=0, right=n-1)

@@ -6,10 +6,12 @@ Bit manipulation problems for technical interviews.
 
 
 # 1. Sum of Two Integers
+# PATTERN: Bit Manipulation (XOR and AND)
 def get_sum(a, b):
     """
     Add two integers without using + or - operators.
     
+    Pattern: XOR for sum, AND << 1 for carry
     Approach: Bit manipulation with XOR and AND
     Steps:
     1. XOR gives sum without carry: a ^ b
@@ -30,10 +32,12 @@ def get_sum(a, b):
 
 
 # 2. Number of 1 Bits (Hamming Weight)
+# PATTERN: Bit Manipulation (Brian Kernighan's Algorithm)
 def hamming_weight(n):
     """
     Count number of '1' bits in integer.
     
+    Pattern: n & (n-1) removes rightmost 1-bit
     Approach: Check each bit or use n & (n-1) trick
     Steps:
     1. n & (n-1) removes rightmost 1 bit
@@ -49,10 +53,12 @@ def hamming_weight(n):
 
 
 # 3. Counting Bits
+# PATTERN: Dynamic Programming (Bit DP)
 def count_bits(n):
     """
     Return array where ans[i] is number of 1's in binary of i.
     
+    Pattern: DP with i >> 1 + (i & 1)
     Approach: DP using i & (i-1) relationship
     Steps:
     1. dp[i] = dp[i & (i-1)] + 1
@@ -70,10 +76,12 @@ def count_bits(n):
 
 
 # 4. Missing Number
+# PATTERN: Bit Manipulation (XOR)
 def missing_number(nums):
     """
     Find missing number in array containing n distinct numbers in range [0, n].
     
+    Pattern: XOR cancellation - all pairs cancel out
     Approach 1: XOR (all numbers XOR with indices)
     Approach 2: Gauss sum formula
     
@@ -96,10 +104,12 @@ def missing_number(nums):
 
 
 # 5. Reverse Bits
+# PATTERN: Bit Manipulation (Bit Reversal)
 def reverse_bits(n):
     """
     Reverse bits of a 32-bit unsigned integer.
     
+    Pattern: Extract each bit and build reversed result
     Approach: Build result bit by bit
     Steps:
     1. Extract rightmost bit: n & 1
