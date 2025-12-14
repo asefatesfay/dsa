@@ -99,6 +99,47 @@ def max_profit(prices):
     
     return max_profit
 
+def buy_and_sell_stock_using_two_pointers(prices):
+    """
+    Alternative approach using two pointers to find max profit.
+    
+    Problem: Find max profit from buying on one day and selling on a later day.
+    Input: prices = [7,1,5,3,6,4]
+    Output: 5 (buy at 1, sell at 6, profit = 6-1 = 5)
+    
+    Pattern: Two Pointers
+    Approach: Use left pointer for buy day and right pointer for sell day
+    
+    Algorithm Steps:
+    1. Initialize left = 0 (buy day), right = 1 (sell day)
+    2. Initialize max_profit = 0
+    3. While right < len(prices):
+       a. If prices[right] > prices[left]:
+          - Calculate profit = prices[right] - prices[left]
+          - Update max_profit if profit is larger
+       b. Else:
+          - Move left pointer to right (new buy day)
+       c. Move right pointer forward
+    4. Return max_profit
+    """
+    if not prices:
+        return 0
+    
+    left = 0
+    right = 1
+    max_profit = 0
+    
+    while right < len(prices):
+        if prices[right] > prices[left]:
+            profit = prices[right] - prices[left]
+            if profit > max_profit:
+                max_profit = profit
+        else:
+            left = right
+        right += 1
+    
+    return max_profit
+
 
 # 3. Contains Duplicate
 # PATTERN: Hash Set
