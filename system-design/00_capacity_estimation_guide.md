@@ -172,11 +172,165 @@ Much easier mentally!
 1 year = 365 days ≈ 31.5 million seconds ≈ 32 million seconds
 ```
 
-### Throughput
+### Throughput (Bandwidth)
+
+Throughput measures **how much data flows through your network per second**.
+
+#### Understanding Bits vs Bytes
+
+**Critical distinction:**
+- **Bits (b)** - Used for **network speed** (bandwidth, throughput)
+- **Bytes (B)** - Used for **file sizes** (storage)
+
+**Conversion:** 1 Byte = 8 bits
+```
+Therefore: 1 MB/s (Megabyte per second) = 8 Mbps (Megabit per second)
+```
+
+#### Network Speed Reference Table
+
+| Bits per second | Bytes per second | Conversion | Real-world context |
+|----------------|------------------|------------|-------------------|
+| 1 Kbps | 125 B/s | ÷ 8 | Old dial-up modem |
+| 1 Mbps | 125 KB/s | ÷ 8 | Basic broadband |
+| 10 Mbps | 1.25 MB/s | ÷ 8 | Standard home internet |
+| 100 Mbps | 12.5 MB/s | ÷ 8 | Fast home internet |
+| 1 Gbps | 125 MB/s | ÷ 8 | Gigabit ethernet, fiber |
+| 10 Gbps | 1.25 GB/s | ÷ 8 | Datacenter links |
+| 100 Gbps | 12.5 GB/s | ÷ 8 | High-performance datacenter |
+
+**Memory trick:** Divide bits by 8 to get bytes (or multiply bytes by 8 to get bits)
+
+#### Visual Understanding: Bits vs Bytes
 
 ```
-1 Gbps (Gigabit per second) = 125 MB/s (Megabytes per second)
-1 Mbps = 125 KB/s
+Network advertises: 1 Gbps (Gigabit per second)
+Actual download speed: 125 MB/s (Megabytes per second)
+
+Why? 1 Gb = 1,000 Mb = 1,000,000 Kb = 1,000,000,000 bits
+      1,000,000,000 bits ÷ 8 = 125,000,000 Bytes = 125 MB
+```
+
+#### Common Throughput Calculations
+
+**Scenario 1: Calculate bandwidth from file size and time**
+```
+Question: Streaming 1 GB file in 10 seconds, what bandwidth?
+
+Answer:
+  1 GB in 10 seconds
+  = 1,000 MB / 10 seconds
+  = 100 MB/s (Megabytes per second)
+  = 100 × 8 = 800 Mbps (Megabits per second)
+```
+
+**Scenario 2: Calculate bandwidth from requests per second**
+```
+Question: 10,000 requests/sec, each response is 200 KB. What bandwidth?
+
+Answer:
+  10,000 requests/sec × 200 KB
+  = 2,000,000 KB/sec
+  = 2,000 MB/sec
+  = 2 GB/sec (Gigabytes per second)
+  = 2 × 8 = 16 Gbps (Gigabits per second)
+```
+
+**Scenario 3: How many requests can bandwidth support?**
+```
+Question: 10 Gbps link, each request is 500 KB. How many requests/sec?
+
+Answer:
+  10 Gbps = 10 ÷ 8 = 1.25 GB/s = 1,250 MB/s
+  1,250 MB/s ÷ 0.5 MB per request
+  = 2,500 requests/sec
+```
+
+#### Shortcut for Interviews
+
+**Quick conversion (Gbps ↔ GB/s):**
+```
+Gbps → GB/s: Divide by 8
+  80 Gbps → 80 ÷ 8 = 10 GB/s
+
+GB/s → Gbps: Multiply by 8
+  5 GB/s → 5 × 8 = 40 Gbps
+```
+
+**Rule of thumb:** 
+- 1 Gbps ≈ 125 MB/s ≈ 0.125 GB/s
+- 10 Gbps ≈ 1.25 GB/s
+- 100 Gbps ≈ 12.5 GB/s
+
+#### Practice Problems: Throughput
+
+**Problem 1:**
+50,000 images/sec, each 200 KB. What's the bandwidth?
+
+<details>
+<summary>Solution</summary>
+
+```
+50,000 requests/sec × 200 KB
+= 10,000,000 KB/sec
+= 10,000 MB/sec
+= 10 GB/sec
+= 10 × 8 = 80 Gbps
+```
+</details>
+
+**Problem 2:**
+You have a 40 Gbps link. Each video stream needs 5 Mbps. How many concurrent streams?
+
+<details>
+<summary>Solution</summary>
+
+```
+40 Gbps = 40,000 Mbps
+40,000 Mbps ÷ 5 Mbps per stream
+= 8,000 concurrent streams
+```
+</details>
+
+**Problem 3:**
+Downloading 500 MB at 100 Mbps. How long does it take?
+
+<details>
+<summary>Solution</summary>
+
+```
+100 Mbps = 100 ÷ 8 = 12.5 MB/s
+500 MB ÷ 12.5 MB/s = 40 seconds
+```
+</details>
+
+#### Common Interview Bandwidths
+
+| Service Type | Typical Bandwidth |
+|-------------|-------------------|
+| Single HD video stream | 5 Mbps |
+| Single 4K video stream | 25 Mbps |
+| Photo upload (2 MB) | Need 16 Mbps for 1/sec |
+| API response (10 KB) | Need 80 Kbps for 10/sec |
+| Database query result (1 MB) | Need 8 Mbps for 1/sec |
+| Large file download (100 MB) | Need 800 Mbps for 1/sec |
+
+#### Why This Matters in System Design
+
+**Example mistake:**
+```
+❌ "We transfer 100 GB/sec, so we need 100 Gbps"
+✅ "We transfer 100 GB/sec, so we need 100 × 8 = 800 Gbps"
+
+Forgetting the 8× conversion can make designs fail!
+```
+
+**Example calculation:**
+```
+Instagram uploads: 2,000 photos/sec × 2 MB = 4 GB/sec
+Bandwidth needed: 4 GB/sec × 8 = 32 Gbps
+
+With peak traffic (3×): 32 × 3 = 96 Gbps ingress bandwidth
 ```
 
 ---
