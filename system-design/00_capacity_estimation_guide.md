@@ -36,16 +36,133 @@ These calculations help you:
 
 ### Data Sizes
 
-| Unit | Bytes | Example |
-|------|-------|---------|
-| 1 Byte (B) | 1 | Single character |
-| 1 Kilobyte (KB) | 1,000 | Short email |
-| 1 Megabyte (MB) | 1,000,000 | Photo |
-| 1 Gigabyte (GB) | 1,000,000,000 | Movie |
-| 1 Terabyte (TB) | 1,000,000,000,000 | 250,000 photos |
-| 1 Petabyte (PB) | 1,000,000,000,000,000 | Google daily data |
+#### Understanding Binary vs Decimal
 
-**Simplification for calculations:** Use powers of 10 (1 KB = 1,000 bytes) instead of powers of 2 (1 KiB = 1,024 bytes) for speed.
+**Two systems exist:**
+
+1. **Binary (Powers of 2)** - How computers actually work:
+   - 1 KiB (Kibibyte) = 2^10 = 1,024 bytes
+   - 1 MiB (Mebibyte) = 2^20 = 1,048,576 bytes
+   - 1 GiB (Gibibyte) = 2^30 = 1,073,741,824 bytes
+   - 1 TiB (Tebibyte) = 2^40 bytes
+   - 1 PiB (Pebibyte) = 2^50 bytes
+
+2. **Decimal (Powers of 10)** - Marketing and simplicity:
+   - 1 KB (Kilobyte) = 10^3 = 1,000 bytes
+   - 1 MB (Megabyte) = 10^6 = 1,000,000 bytes
+   - 1 GB (Gigabyte) = 10^9 = 1,000,000,000 bytes
+   - 1 TB (Terabyte) = 10^12 = 1,000,000,000,000 bytes
+   - 1 PB (Petabyte) = 10^15 = 1,000,000,000,000,000 bytes
+
+**For interviews: Use decimal (powers of 10)** - It's faster and simpler!
+
+#### Visual Comparison Table
+
+| Unit | Powers of 2 (Actual) | Powers of 10 (Interview) | Difference | Real-World Example |
+|------|---------------------|--------------------------|------------|-------------------|
+| **KB** | 2^10 = 1,024 bytes | 10^3 = 1,000 bytes | ~2% | Short text file, small email |
+| **MB** | 2^20 = 1,048,576 bytes | 10^6 = 1,000,000 bytes | ~5% | High-res photo, MP3 song |
+| **GB** | 2^30 = 1,073,741,824 bytes | 10^9 = 1,000,000,000 bytes | ~7% | HD movie, smartphone app |
+| **TB** | 2^40 = 1,099,511,627,776 bytes | 10^12 = 1,000,000,000,000 bytes | ~10% | External hard drive, 500 HD movies |
+| **PB** | 2^50 = 1,125,899,906,842,624 bytes | 10^15 = 1,000,000,000,000,000 bytes | ~13% | Facebook daily uploads, YouTube hourly uploads |
+
+**Key insight:** The difference is small enough that using powers of 10 is acceptable for estimation!
+
+#### Memory Aid: "The Thousand Ladder"
+
+Think of each step as **×1,000** (three zeros):
+
+```
+1 Byte
+    ↓ ×1,000
+1,000 Bytes = 1 KB
+    ↓ ×1,000
+1,000,000 Bytes = 1,000 KB = 1 MB
+    ↓ ×1,000
+1,000,000,000 Bytes = 1,000,000 KB = 1,000 MB = 1 GB
+    ↓ ×1,000
+1,000,000,000,000 Bytes = 1,000,000,000 KB = 1,000,000 MB = 1,000 GB = 1 TB
+    ↓ ×1,000
+1,000,000,000,000,000 Bytes = 1 PB
+```
+
+**Simple pattern:** Each level adds **3 zeros** or **×1,000**
+
+#### Powers of 10 Quick Reference
+
+| Unit | Formula | Zeros | Scientific Notation |
+|------|---------|-------|---------------------|
+| KB | 10^3 | 1,000 (3 zeros) | 1 × 10^3 |
+| MB | 10^6 | 1,000,000 (6 zeros) | 1 × 10^6 |
+| GB | 10^9 | 1,000,000,000 (9 zeros) | 1 × 10^9 |
+| TB | 10^12 | 1,000,000,000,000 (12 zeros) | 1 × 10^12 |
+| PB | 10^15 | 1,000,000,000,000,000 (15 zeros) | 1 × 10^15 |
+
+**Memory trick:** The exponent tells you how many zeros!
+- KB = 10^**3** → **3** zeros → 1,000
+- MB = 10^**6** → **6** zeros → 1,000,000
+- GB = 10^**9** → **9** zeros → 1,000,000,000
+
+#### Conversion Practice
+
+**Converting UP (smaller → larger):**
+```
+Question: 5,000 KB to MB?
+Answer: Divide by 1,000 → 5,000 ÷ 1,000 = 5 MB
+
+Question: 3,000,000 KB to GB?
+Answer: Divide by 1,000,000 → 3,000,000 ÷ 1,000,000 = 3 GB
+        OR: 3,000,000 KB → 3,000 MB → 3 GB (two steps of ÷1,000)
+```
+
+**Converting DOWN (larger → smaller):**
+```
+Question: 2 GB to MB?
+Answer: Multiply by 1,000 → 2 × 1,000 = 2,000 MB
+
+Question: 5 TB to GB?
+Answer: Multiply by 1,000 → 5 × 1,000 = 5,000 GB
+```
+
+#### Real-World Size Examples
+
+| Size | What It Holds |
+|------|---------------|
+| **1 KB** | • Half a page of text<br>• Small email with no attachments<br>• Tiny icon (16×16 pixels) |
+| **1 MB** | • 1 high-quality photo (compressed)<br>• 1 minute of MP3 music<br>• 500 pages of text<br>• 1 book (average novel) |
+| **1 GB** | • 1 hour of SD video<br>• 250 MP3 songs<br>• 500 high-quality photos<br>• 1 small mobile game |
+| **1 TB** | • 500 hours of HD video (movies)<br>• 250,000 photos<br>• 200,000 songs<br>• 1,000 hours of music |
+| **1 PB** | • 500 million photos<br>• 13.3 years of HD video<br>• 10 billion phone contacts<br>• 20 million filing cabinets of text |
+
+#### Mental Calculation Shortcuts
+
+**Technique 1: Break into smaller steps**
+```
+Instead of: 200,000,000 KB → ? GB
+
+Do this:
+  200,000,000 KB
+  → 200,000 MB (÷ 1,000)
+  → 200 GB (÷ 1,000)
+
+Much easier mentally!
+```
+
+**Technique 2: Move the decimal**
+```
+5,000 KB to MB?
+  5,000. KB → Move decimal 3 places left → 5.000 MB = 5 MB
+
+3,500,000 MB to TB?
+  3,500,000. MB → Move 3 places (MB→GB) → 3,500. GB
+  3,500. GB → Move 3 places (GB→TB) → 3.5 TB
+```
+
+**Technique 3: Use scientific notation**
+```
+2 × 10^8 bytes to MB?
+  MB = 10^6, so divide: 2 × 10^8 ÷ 10^6 = 2 × 10^(8-6) = 2 × 10^2 = 200 MB
+```
 
 ### Time Conversions
 
@@ -64,9 +181,105 @@ These calculations help you:
 
 ---
 
+---
+
+## 🎓 Learning Strategy: Practice Exercises
+
+Before jumping into the full example, **practice these mini-exercises** to build intuition:
+
+### Exercise Set 1: Basic Conversions
+
+Convert these (answers below):
+1. 5,000 KB = ? MB
+2. 3,000 MB = ? GB
+3. 2,000,000 KB = ? GB
+4. 500 GB = ? TB
+5. 10 TB = ? GB
+
+<details>
+<summary>Answers</summary>
+
+1. 5,000 KB = 5 MB (÷ 1,000)
+2. 3,000 MB = 3 GB (÷ 1,000)
+3. 2,000,000 KB = 2,000 MB = 2 GB (÷ 1,000 twice)
+4. 500 GB = 0.5 TB (÷ 1,000)
+5. 10 TB = 10,000 GB (× 1,000)
+
+</details>
+
+### Exercise Set 2: Real-World Estimation
+
+Estimate storage needed:
+1. Store 1 million photos, each 200 KB
+2. Store 500,000 videos, each 50 MB
+3. Store 10 billion text messages, each 100 bytes
+4. Store 1 million user profiles, each 5 KB
+
+<details>
+<summary>Answers with work shown</summary>
+
+1. **1 million photos × 200 KB**
+   - = 1,000,000 × 200 KB
+   - = 200,000,000 KB
+   - = 200,000 MB
+   - = 200 GB
+
+2. **500,000 videos × 50 MB**
+   - = 500,000 × 50 MB
+   - = 25,000,000 MB
+   - = 25,000 GB
+   - = 25 TB
+
+3. **10 billion messages × 100 bytes**
+   - = 10,000,000,000 × 100 bytes
+   - = 1,000,000,000,000 bytes
+   - = 1,000 GB (÷ 1,000,000,000)
+   - = 1 TB
+
+4. **1 million profiles × 5 KB**
+   - = 1,000,000 × 5 KB
+   - = 5,000,000 KB
+   - = 5,000 MB
+   - = 5 GB
+
+</details>
+
+### Exercise Set 3: Speed Calculations
+
+Calculate requests per second:
+1. 100 million requests per day
+2. 5 billion reads per day
+3. 1 million writes per day
+4. 500,000 uploads per day
+
+<details>
+<summary>Answers with work shown</summary>
+
+**Reminder:** 1 day ≈ 100,000 seconds (rounded from 86,400)
+
+1. **100 million per day**
+   - = 100,000,000 / 100,000
+   - = 1,000 requests/sec
+
+2. **5 billion per day**
+   - = 5,000,000,000 / 100,000
+   - = 50,000 reads/sec
+
+3. **1 million per day**
+   - = 1,000,000 / 100,000
+   - = 10 writes/sec
+
+4. **500,000 per day**
+   - = 500,000 / 100,000
+   - = 5 uploads/sec
+
+</details>
+
+---
+
 ## 🎯 Real World Example: Instagram-like Photo Sharing App
 
-Let's design a photo-sharing service like Instagram and estimate its capacity requirements.
+Now let's design a photo-sharing service like Instagram and estimate its capacity requirements using what you learned!
 
 ### Step 1: Define Requirements & Assumptions
 
