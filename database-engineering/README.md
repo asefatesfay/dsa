@@ -592,6 +592,406 @@ pgbench -c 50 -T 60 -f test.sql mydb
 
 ---
 
+## 🚫 Common Database Problems & Solutions
+
+### Problem 1: Deadlocks
+
+**Scenario:** E-commerce inventory system experiencing deadlocks
+
+```sql
+-- Transaction 1
+BEGIN;
+UPDATE inventory SET quantity = quantity - 1 WHERE product_id = 100;
+UPDATE inventory SET quantity = quantity - 1 WHERE product_id = 200;
+COMMIT;
+
+-- Transaction 2 (running simultaneously)
+BEGIN;
+UPDATE inventory SET quantity = quantity - 1 WHERE product_id = 200;
+UPDATE inventory SET quantity = quantity - 1 WHERE product_id = 100;
+COMMIT;
+
+-- Result: DEADLOCK!
+```
+
+**Solution:** Always acquire locks in consistent order
+
+```sql
+-- Both transactions now lock in ascending product_id order
+BEGIN;
+UPDATE inventory SET quantity = quantity - 1 
+WHERE product_id IN (100, 200)
+ORDER BY product_id;  -- Consistent lock ordering
+COMMIT;
+```
+
+### Problem 2: Table Bloat
+
+**Symptom:** Table size keeps growing even after deleting rows
+
+```bash
+# Check table bloat
+SELECT 
+    schemaname,
+    tablename,
+    pg_size_pretty(pg_total_relation_size(schemaname||'.'||tablename)) AS size,
+    pg_size_pretty(pg_total_relation_size(schemaname||'.'||tablename) - 
+                   pg_relation_size(schemaname||'.'||tablename)) AS bloat
+FROM pg_tables
+WHERE schemaname = 'public'
+ORDER BY pg_total_relation_size(schemaname||'.'||tablename) DESC;
+```
+
+**Solution:**
+
+```sql
+-- Gentle approach (online, doesn't lock)
+VACUUM ANALYZE photos;
+
+-- Aggressive approach (locks table, reclaims space immediately)
+VACUUM FULL photos;
+
+-- Automate with pg_cron
+CREATE EXTENSION pg_cron;
+SELECT cron.schedule('vacuum-photos', '0 3 * * 0', 'VACUUM ANALYZE photos');
+```
+
+### Problem 3: Missing Index Detection
+
+```sql
+-- Find queries doing sequential scans
+SELECT 
+    schemaname,
+    tablename,
+    seq_scan,
+    seq_tup_read,
+    idx_scan,
+    seq_tup_read / seq_scan as avg_seq_read
+FROM pg_stat_user_tables
+WHERE seq_scan > 0
+ORDER BY seq_tup_read DESC
+LIMIT 20;
+
+-- Find unused indexes (candidates for removal)
+SELECT 
+    schemaname,
+    tablename,
+    indexname,
+    idx_scan,
+    pg_size_pretty(pg_relation_size(indexrelid)) as index_size
+FROM pg_stat_user_indexes
+WHERE idx_scan = 0
+    AND indexrelname NOT LIKE '%pkey%'
+ORDER BY pg_relation_size(indexrelid) DESC;
+```
+
+### Problem 4: Connection Pool Exhaustion
+
+```python
+# Bad: Creating connection per request
+def get_user(user_id):
+    conn = psycopg2.connect(DATABASE_URL)  # New connection every time!
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM users WHERE id = %s", (user_id,))
+    user = cursor.fetchone()
+    conn.close()
+    return user
+
+# Good: Use connection pooling
+from psycopg2.pool import ThreadedConnectionPool
+
+pool = ThreadedConnectionPool(
+    minconn=5,
+    maxconn=20,
+    dsn=DATABASE_URL
+)
+
+def get_user(user_id):
+    conn = pool.getconn()
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM users WHERE id = %s", (user_id,))
+        return cursor.fetchone()
+    finally:
+        pool.putconn(conn)
+
+# Even better: Use SQLAlchemy with pool
+from sqlalchemy import create_engine
+from sqlalchemy.pool import QueuePool
+
+engine = create_engine(
+    DATABASE_URL,
+    poolclass=QueuePool,
+    pool_size=10,
+    max_overflow=20,
+    pool_pre_ping=True,  # Verify connection health
+    pool_recycle=3600    # Recycle connections after 1 hour
+)
+```
+
+### Problem 5: Slow COUNT(*) Queries
+
+```sql
+-- Slow on large tables (scans entire table)
+SELECT COUNT(*) FROM users;  -- 30 seconds on 100M rows
+
+-- Solution 1: Use approximate count
+SELECT reltuples::bigint AS estimate
+FROM pg_class
+WHERE relname = 'users';  -- Instant, ~5% accuracy
+
+-- Solution 2: Cache count in Redis
+RED> INCR user_count  # When inserting user
+RED> GET user_count   # When reading count
+
+-- Solution 3: Maintain counter table
+CREATE TABLE counters (
+    table_name VARCHAR(50) PRIMARY KEY,
+    count BIGINT DEFAULT 0,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE OR REPLACE FUNCTION update_user_count()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF TG_OP = 'INSERT' THEN
+        UPDATE counters SET count = count + 1 WHERE table_name = 'users';
+    ELSIF TG_OP = 'DELETE' THEN
+        UPDATE counters SET count = count - 1 WHERE table_name = 'users';
+    END IF;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+```
+
+---
+
+## 🎯 Real Interview Questions
+
+### Q1: Design a database schema for Twitter
+
+**Requirements:**
+- Users can post tweets (280 chars)
+- Users can follow other users
+- Users can like and retweet
+- Feed shows tweets from followed users
+- Handle 500M users, 500M tweets/day
+
+**Answer:**
+
+```sql
+-- Users table (sharded by user_id)
+CREATE TABLE users (
+    user_id BIGSERIAL PRIMARY KEY,
+    username VARCHAR(15) UNIQUE NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    bio VARCHAR(160),
+    follower_count INT DEFAULT 0,
+    following_count INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    -- Shard key for routing
+    shard_id INT GENERATED ALWAYS AS (user_id % 64) STORED
+);
+CREATE INDEX idx_users_shard ON users(shard_id, user_id);
+
+-- Tweets table (sharded by user_id for co-location)
+CREATE TABLE tweets (
+    tweet_id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    content VARCHAR(280) NOT NULL,
+    like_count INT DEFAULT 0,
+    retweet_count INT DEFAULT 0,
+    reply_count INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    shard_id INT GENERATED ALWAYS AS (user_id % 64) STORED
+);
+CREATE INDEX idx_tweets_user_time ON tweets(user_id, created_at DESC);
+CREATE INDEX idx_tweets_shard ON tweets(shard_id, user_id);
+
+-- Follows table (sharded by follower_id)
+CREATE TABLE follows (
+    follower_id BIGINT NOT NULL,
+    following_id BIGINT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    PRIMARY KEY (follower_id, following_id),
+    shard_id INT GENERATED ALWAYS AS (follower_id % 64) STORED
+);
+CREATE INDEX idx_follows_following ON follows(following_id, follower_id);
+
+-- Likes table (Cassandra for write-heavy workload)
+-- Schema in Cassandra:
+CREATE TABLE likes (
+    tweet_id BIGINT,
+    user_id BIGINT,
+    created_at TIMESTAMP,
+    PRIMARY KEY (tweet_id, user_id)
+) WITH CLUSTERING ORDER BY (user_id ASC);
+
+-- Feed timeline (Redis Sorted Set)
+-- Key: feed:{user_id}
+-- Score: timestamp
+-- Value: tweet_id
+
+-- Example feed population (fan-out on write for users with <10K followers)
+ZADD feed:12345 1640000000 tweet_100
+ZADD feed:12345 1640000001 tweet_101
+```
+
+**Architecture Decision:**
+- **Hot data (last 7 days):** PostgreSQL shards
+- **Cold data (>7 days):** Cassandra or S3 + Athena
+- **Feed cache:** Redis sorted sets
+- **Celebrities (>1M followers):** Fan-out on read instead of write
+- **Search:** Elasticsearch
+- **Analytics:** Snowflake data warehouse
+
+### Q2: How would you migrate 1TB database with zero downtime?
+
+**Answer:**
+
+```bash
+# Phase 1: Set up replication (Debezium or AWS DMS)
+# Old DB -> Kafka -> New DB
+
+# Phase 2: Backfill historical data
+pg_dump -h old-db -U admin -d mydb \
+  --schema-only > schema.sql
+
+psql -h new-db -U admin -d mydb < schema.sql
+
+pg_dump -h old-db -U admin -d mydb \
+  --data-only --disable-triggers \
+  | psql -h new-db -U admin -d mydb
+
+# Phase 3: Verify data consistency
+SELECT COUNT(*), MAX(id), MIN(id), 
+       SUM(CAST(id AS BIGINT)) as checksum
+FROM users;
+-- Compare results from both databases
+
+# Phase 4: Dual writes
+# Application writes to BOTH old and new DB
+# Reads still from old DB
+
+# Phase 5: Switch reads to new DB
+# Monitor for 24-48 hours
+
+# Phase 6: Decommission old DB
+```
+
+**Python Implementation:**
+
+```python
+class DualWriteDatabase:
+    def __init__(self, old_db, new_db):
+        self.old_db = old_db
+        self.new_db = new_db
+        self.write_to_new = True  # Feature flag
+    
+    def write(self, query, params):
+        # Always write to old DB (source of truth)
+        result = self.old_db.execute(query, params)
+        
+        if self.write_to_new:
+            try:
+                # Also write to new DB
+                self.new_db.execute(query, params)
+            except Exception as e:
+                # Log error but don't fail request
+                logger.error(f"New DB write failed: {e}")
+        
+        return result
+    
+    def read(self, query, params):
+        # Read from old DB initially
+        if not self.read_from_new:
+            return self.old_db.execute(query, params)
+        
+        # After verification, switch to new DB
+        return self.new_db.execute(query, params)
+```
+
+### Q3: Database is slow. How do you troubleshoot?
+
+**Systematic Approach:**
+
+```sql
+-- Step 1: Check current queries
+SELECT 
+    pid,
+    now() - query_start as duration,
+    state,
+    query
+FROM pg_stat_activity
+WHERE state != 'idle'
+    AND query NOT ILIKE '%pg_stat_activity%'
+ORDER BY duration DESC;
+
+-- Step 2: Find blocking queries
+SELECT 
+    blocked_locks.pid AS blocked_pid,
+    blocked_activity.usename AS blocked_user,
+    blocking_locks.pid AS blocking_pid,
+    blocking_activity.usename AS blocking_user,
+    blocked_activity.query AS blocked_statement,
+    blocking_activity.query AS blocking_statement
+FROM pg_catalog.pg_locks blocked_locks
+JOIN pg_catalog.pg_stat_activity blocked_activity ON blocked_activity.pid = blocked_locks.pid
+JOIN pg_catalog.pg_locks blocking_locks ON blocking_locks.locktype = blocked_locks.locktype
+JOIN pg_catalog.pg_stat_activity blocking_activity ON blocking_activity.pid = blocking_locks.pid
+WHERE NOT blocked_locks.granted
+    AND blocking_locks.granted;
+
+-- Step 3: Check slow queries log
+SELECT 
+    calls,
+    total_exec_time,
+    mean_exec_time,
+    max_exec_time,
+    query
+FROM pg_stat_statements
+ORDER BY mean_exec_time DESC
+LIMIT 20;
+
+-- Step 4: Check table/index statistics
+SELECT 
+    schemaname,
+    tablename,
+    last_vacuum,
+    last_autovacuum,
+    last_analyze,
+    last_autoanalyze,
+    n_dead_tup
+FROM pg_stat_user_tables
+WHERE n_dead_tup > 10000
+ORDER BY n_dead_tup DESC;
+
+-- Step 5: Check cache hit ratio
+SELECT 
+    sum(heap_blks_read) as heap_read,
+    sum(heap_blks_hit) as heap_hit,
+    sum(heap_blks_hit) / (sum(heap_blks_hit) + sum(heap_blks_read)) as ratio
+FROM pg_statio_user_tables;
+-- Should be > 0.99 (99% cache hit rate)
+```
+
+**Checklist:**
+1. ☐ Check CPU, memory, disk I/O on server
+2. ☐ Identify slow queries with EXPLAIN ANALYZE
+3. ☐ Check for missing indexes
+4. ☐ Look for table bloat (vacuum needed)
+5. ☐ Check connection pool settings
+6. ☐ Verify cache hit ratio
+7. ☐ Check for lock contention
+8. ☐ Review recent config changes
+9. ☐ Check application query patterns
+10. ☐ Consider read replicas if read-heavy
+
+---
+
 ## 📚 Learning Resources
 
 **Books:**
